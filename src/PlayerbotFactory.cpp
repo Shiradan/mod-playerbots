@@ -178,10 +178,10 @@ void PlayerbotFactory::Randomize(bool incremental)
     // {
     //     return;
     // }
-
-    LOG_INFO("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
+    LOG_INFO("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"), bot->GetName().c_str(), bot->GetLevel(), bot->getClass());
+    // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
     Prepare();
-    LOG_INFO("playerbots", "Resetting player...");
+    LOG_DEBUG("playerbots", "Resetting player...");
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
     bot->resetTalents(true);
     // bot->SaveToDB(false, false);
@@ -212,41 +212,23 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo)
         pmo->finish();
     */
-    InitInstanceQuests();
-    // clear quest reward inventory
-    ClearInventory();
-    bot->GiveLevel(level);
 
-    if (sPlayerbotAIConfig->randomBotPreQuests)
-    {
-        uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
-        LOG_INFO("playerbots", "Initializing quests...");
+    if (sPlayerbotAIConfig->randomBotPreQuests){
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Quests");
-        InitQuests(classQuestIds);
-        InitQuests(specialQuestIds);
-
-        // quest rewards boost bot level, so reduce back
-        
-        bot->GiveLevel(level);
-        
-
-        ClearInventory();
-        bot->SetUInt32Value(PLAYER_XP, currentXP);
-        CancelAuras();
-        bot->SaveToDB(false, false);
-        if (pmo)
+        InitInstanceQuests();
+        if (pmo) 
             pmo->finish();
     }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
-    LOG_INFO("playerbots", "Initializing spells (step 1)...");
+    LOG_DEBUG("playerbots", "Initializing spells (step 1)...");
     // bot->LearnDefaultSkills();
     InitClassSpells();
     InitAvailableSpells();
     if (pmo)
         pmo->finish();
 
-    LOG_INFO("playerbots", "Initializing skills (step 1)...");
+    LOG_DEBUG("playerbots", "Initializing skills (step 1)...");
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills1");
     InitSkills();
     InitSpecialSpells();
@@ -256,7 +238,7 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Talents");
-    LOG_INFO("playerbots", "Initializing talents...");
+    LOG_DEBUG("playerbots", "Initializing talents...");
     if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
         InitTalentsTree();
     }
@@ -270,13 +252,13 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells2");
-    LOG_INFO("playerbots", "Initializing spells (step 2)...");
+    LOG_DEBUG("playerbots", "Initializing spells (step 2)...");
     InitAvailableSpells();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Mounts");
-    LOG_INFO("playerbots", "Initializing mounts...");
+    LOG_DEBUG("playerbots", "Initializing mounts...");
     InitMounts();
     bot->SaveToDB(false, false);
     if (pmo)
@@ -289,7 +271,7 @@ void PlayerbotFactory::Randomize(bool incremental)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
-    LOG_INFO("playerbots", "Initializing equipmemt...");
+    LOG_DEBUG("playerbots", "Initializing equipmemt...");
     if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel) {
         InitEquipment(incremental);
     }
@@ -307,38 +289,38 @@ void PlayerbotFactory::Randomize(bool incremental)
     // }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Bags");
-    LOG_INFO("playerbots", "Initializing bags...");
+    LOG_DEBUG("playerbots", "Initializing bags...");
     InitBags();
     // bot->SaveToDB(false, false);
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Ammo");
-    LOG_INFO("playerbots", "Initializing ammo...");
+    LOG_DEBUG("playerbots", "Initializing ammo...");
     InitAmmo();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Food");
-    LOG_INFO("playerbots", "Initializing food...");
+    LOG_DEBUG("playerbots", "Initializing food...");
     InitFood();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Potions");
-    LOG_INFO("playerbots", "Initializing potions...");
+    LOG_DEBUG("playerbots", "Initializing potions...");
     InitPotions();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Reagents");
-    LOG_INFO("playerbots", "Initializing reagents...");
+    LOG_DEBUG("playerbots", "Initializing reagents...");
     InitReagents();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_EqSets");
-    LOG_INFO("playerbots", "Initializing second equipment set...");
+    LOG_DEBUG("playerbots", "Initializing second equipment set...");
     // InitSecondEquipmentSet();
     if (pmo)
         pmo->finish();
@@ -355,18 +337,18 @@ void PlayerbotFactory::Randomize(bool incremental)
     // }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Inventory");
-    LOG_INFO("playerbots", "Initializing inventory...");
+    LOG_DEBUG("playerbots", "Initializing inventory...");
     // InitInventory();
     if (pmo)
         pmo->finish();
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Consumable");
-    LOG_INFO("playerbots", "Initializing consumables...");
+    LOG_DEBUG("playerbots", "Initializing consumables...");
     AddConsumables();
     if (pmo)
         pmo->finish();
     
-    LOG_INFO("playerbots", "Initializing glyphs...");
+    LOG_DEBUG("playerbots", "Initializing glyphs...");
     bot->SaveToDB(false, false);
     InitGlyphs();
     
@@ -394,7 +376,7 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (bot->getLevel() >= 10)
     {
         pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
-        LOG_INFO("playerbots", "Initializing pet...");
+        LOG_DEBUG("playerbots", "Initializing pet...");
         InitPet();
         bot->SaveToDB(false, false);
         InitPetTalents();
@@ -403,12 +385,12 @@ void PlayerbotFactory::Randomize(bool incremental)
     }
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Save");
-    LOG_INFO("playerbots", "Saving to DB...");
+    LOG_DEBUG("playerbots", "Saving to DB...");
     bot->SetMoney(urand(level * 100000, level * 5 * 100000));
     bot->SetHealth(bot->GetMaxHealth());
     bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     bot->SaveToDB(false, false);
-    LOG_INFO("playerbots", "Done.");
+    LOG_INFO("playerbots", "Initialization Done.");
     if (pmo)
         pmo->finish();
 }
@@ -601,11 +583,11 @@ void PlayerbotFactory::InitPetTalents()
         return;
     }
     CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(ci->family);
-    if (pet_family->petTalentType < 0) {
+    if (!pet_family || pet_family->petTalentType < 0) {
         // LOG_INFO("playerbots", "{} init pet talents failed with petTalentType < 0({})", bot->GetName().c_str(), pet_family->petTalentType);
         return;
     }
-    pet->resetTalents();
+    // pet->resetTalents();
     std::unordered_map<uint32, std::vector<TalentEntry const*> > spells;
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
@@ -751,7 +733,7 @@ void PlayerbotFactory::InitPet()
     {
         LOG_ERROR("playerbots", "Cannot create pet for bot {}", bot->GetName().c_str());
         return;
-}
+    }
 
     // LOG_INFO("playerbots", "Start make spell auto cast for {} spells. {} already auto casted.", pet->m_spells.size(), pet->GetPetAutoSpellSize());
     for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
@@ -1523,6 +1505,10 @@ void PlayerbotFactory::InitEquipment(bool incremental)
             uint32 newItemId = ids[index];
             
             uint16 dest;
+
+            if (oldItem && oldItem->GetTemplate()->ItemId == newItemId)
+                continue;
+            
             if (!CanEquipUnseenItem(slot, dest, newItemId))
                 continue;
             
@@ -1537,10 +1523,15 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         if (oldItem)
         {
+            // uint8 dstBag = NULL_BAG;
+            // WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
+            // packet << INVENTORY_SLOT_BAG_0 << slot << dstBag;
+            // bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
             bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
         }
         uint16 dest;
-        if (!CanEquipUnseenItem(slot, dest, bestItemForSlot)) {
+        if (!CanEquipUnseenItem(slot, dest, bestItemForSlot))
+        {
             continue;
         }
         Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);
@@ -2445,21 +2436,17 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap)
 void PlayerbotFactory::InitInstanceQuests()
 {
     // Yunfan: use configuration instead of hard code
+    uint32 currentXP = bot->GetUInt32Value(PLAYER_XP);
+    LOG_INFO("playerbots", "Initializing quests...");
+    InitQuests(classQuestIds);
+    InitQuests(specialQuestIds);
 
-    // The Caverns of Time
-    if (bot->GetLevel() >= 64) {
-        uint32 questId = 10277;
-        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
-        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-        bot->RewardQuest(quest, 5, bot, false);
-    }
-    // Return to Andormu
-    if (bot->GetLevel() >= 66) {
-        uint32 questId = 10285;
-        Quest const *quest = sObjectMgr->GetQuestTemplate(questId);
-        bot->SetQuestStatus(questId, QUEST_STATUS_COMPLETE);
-        bot->RewardQuest(quest, 5, bot, false);
-    }
+    // quest rewards boost bot level, so reduce back
+    bot->GiveLevel(level);
+    
+    ClearInventory();
+    bot->SetUInt32Value(PLAYER_XP, currentXP);
+    bot->SaveToDB(false, false);
 }
 
 void PlayerbotFactory::ClearInventory()
@@ -3479,8 +3466,19 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             if (!socketColor) {
                 continue;
             }
+            int32 gemId;
+            if (1 == socketColor)//meta
+                gemId = bestGemEnchantId[0];
+            else if (2 == socketColor)//red
+                gemId = bestGemEnchantId[1];
+            else if (4 == socketColor)//yellow
+                gemId = bestGemEnchantId[2];
+            else if (8 == socketColor)//blue
+                gemId = bestGemEnchantId[3];
+            else
+                continue;
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), false);
-            item->SetEnchantment(EnchantmentSlot(enchant_slot), bestGemEnchantId[socketColor], 0, 0, bot->GetGUID());
+            item->SetEnchantment(EnchantmentSlot(enchant_slot), gemId, 0, 0, bot->GetGUID());
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), true);
         }
     }

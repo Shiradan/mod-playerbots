@@ -364,9 +364,9 @@ Player* PlayerbotHolder::GetPlayerBot(ObjectGuid::LowType lowGuid) const
 void PlayerbotHolder::OnBotLogin(Player* const bot)
 {
     sPlayerbotsMgr->AddPlayerbotData(bot, true);
+    playerBots[bot->GetGUID()] = bot;
     OnBotLoginInternal(bot);
 
-    playerBots[bot->GetGUID()] = bot;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI) {
@@ -627,6 +627,11 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     {
         sRandomPlayerbotMgr->Randomize(bot);
         return "ok";
+    }
+    else if (cmd == "quests"){
+        PlayerbotFactory factory(bot, bot->getLevel());
+        factory.InitInstanceQuests();
+        return "Initialization quests";
     }
     // }
 
